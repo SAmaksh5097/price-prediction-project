@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="text-center mb-4" data-aos="fade-up">
+        <h2>Available Vehicles for Sale</h2>
+        <p class="lead">Use the filters below to find the perfect vehicle for your needs.</p>
+    </div>
+
+    <div class="card mb-5" data-aos="fade-up" data-aos-delay="100">
+        <div class="card-body">
+            <form class="row g-3 align-items-end" method="get" action="{{ url_for('buyer_dashboard') }}">
+                <div class="col-md-4">
+                    <label for="brand" class="form-label">Brand</label>
+                    <select id="brand" name="brand" class="form-select">
+                        <option>Any Brand</option>
+                        {% for company in all_companies %}
+                            <option value="{{ company }}" {% if current_filters.brand == company %}selected{% endif %}>{{ company }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="max_price" class="form-label">Max Budget (Lakhs)</label>
+                    <input type="number" step="0.5" class="form-control" id="max_price" name="max_price" value="{{ current_filters.max_price or '' }}" placeholder="e.g., 8.5">
+                </div>
+                <div class="col-md-3">
+                    <label for="max_age" class="form-label">Max Age (Years)</label>
+                    <input type="number" class="form-control" id="max_age" name="max_age" value="{{ current_filters.max_age or '' }}" placeholder="e.g., 5">
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for vehicle in vehicles %}
+        <div class="col" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+            <div class="card h-100">
+                <div class="card-header"><h5 class="card-title mb-0">{{ vehicle.year }} {{ vehicle.name }}</h5></div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>Driven:</strong> {{ "{:,.0f}".format(vehicle.kms_driven) }} kms<br>
+                        <strong>Fuel:</strong> {{ vehicle.fuel_type }}<br>
+                        <strong>Location:</strong> {{ vehicle.city }}
+                    </p>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><small class="text-body-secondary">Seller's Price</small><h4 class="fw-bold text-danger mb-0">₹ {{ "{:,.2f}".format(vehicle.Price) }} Lakhs</h4></div>
+                        <div><small class="text-body-secondary">AI Predicted Value</small><h4 class="fw-bold text-success mb-0">₹ {{ "{:,.2f}".format(vehicle.predicted_price) }} Lakhs</h4></div>
+                    </div>
+                </div>
+                <div class="card-footer text-center"><span class="badge rounded-pill bg-{{ vehicle.deal_color }} fs-6">{{ vehicle.deal_status }}</span></div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center">
+            <p class="lead">No vehicles found matching your criteria. Please try different filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
